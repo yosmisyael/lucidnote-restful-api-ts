@@ -15,12 +15,18 @@ export class UserTest {
     }
 
     static async create() {
-        await prismaClient.user.create({
+        const user = await prismaClient.user.create({
             data: {
                 name: "test",
                 email: "test@example.com",
                 username: "test",
                 password: await bcrypt.hash("test", 10)
+            }
+        })
+        await prismaClient.session.create({
+            data: {
+                userId: user.id,
+                token: "test"
             }
         })
     }

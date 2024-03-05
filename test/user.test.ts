@@ -91,3 +91,35 @@ describe('POST /api/users/login', () => {
         expect(response.body.error).toBe("Username or password is wrong.");
     })
 })
+
+describe('GET /api/users/current', () => {
+    beforeEach(async () => {
+        await UserTest.create();
+    });
+
+    afterEach(async () => {
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    })
+
+    it('get user data success', async () => {
+        const response = await supertest(server)
+            .get('/api/users/current')
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.username).toBe("test");
+        expect(response.body.data.name).toBe("test");
+    })
+
+    it('deny get user data if token is invalid', async () => {
+        const response = await supertest(server)
+            .get('/api/users/current')
+            .set("X-API-TOKEN", "wrong");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("Unauthorized.");
+    })
+})
