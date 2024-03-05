@@ -4,7 +4,6 @@ import {logger} from "../src/app/logging";
 import {UserTest} from "./test-util";
 
 describe('POST /api/users', () => {
-
     afterEach(async () => {
         await UserTest.delete();
     })
@@ -40,7 +39,6 @@ describe('POST /api/users', () => {
 })
 
 describe('POST /api/users/login', () => {
-
     beforeEach(async () => {
         await UserTest.create();
     });
@@ -117,6 +115,60 @@ describe('GET /api/users/current', () => {
         const response = await supertest(server)
             .get('/api/users/current')
             .set("X-API-TOKEN", "wrong");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("Unauthorized.");
+    })
+})
+
+describe('PATCH /api/users/current', () => {
+    beforeEach(async () => {
+        await UserTest.create();
+    });
+
+    afterEach(async () => {
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    })
+
+    it('update user success', async () => {
+        const response = await supertest(server)
+            .patch('/api/users/current')
+            .set('X-API-TOKEN', 'test')
+            .send({
+                username: "user",
+                name: "user"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.name).toBe("user");
+        expect(response.body.data.username).toBe("user");
+    })
+
+    it('deny update user if request is invalid', async () => {
+        const response = await supertest(server)
+            .patch('/api/users/current')
+            .set('X-API-TOKEN', 'test')
+            .send({
+                username: "",
+                name: ""
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBeDefined();
+    })
+
+    it('deny update user if token is invalid', async () => {
+        const response = await supertest(server)
+            .patch('/api/users/current')
+            .set('X-API-TOKEN', 'wrong')
+            .send({
+                username: "user",
+                name: "user"
+            });
 
         logger.debug(response.body);
         expect(response.status).toBe(401);
