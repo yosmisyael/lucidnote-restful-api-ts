@@ -50,4 +50,20 @@ export class UserController {
             next(e);
         }
     }
+
+    static async logout(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const token = req.headers['x-api-token'] ?? null;
+            if (typeof token === "string") {
+                const response = await UserService.logout(token);
+                if (response === true) {
+                    res.status(200).json({
+                        data: "OK"
+                    })
+                }
+            }
+        } catch (e) {
+            next(e)
+        }
+    }
 }

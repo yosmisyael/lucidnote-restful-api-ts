@@ -1,17 +1,19 @@
 import {prismaClient} from "../src/app/database";
 import bcrypt from "bcrypt";
+import {UserService} from "../src/service/user-service";
+import {Session, User} from "@prisma/client";
 
 export class UserTest {
     static async delete() {
-        await prismaClient.user.deleteMany({
-            where: {
-                username: "test"
-            }
-        });
+        await prismaClient.user.deleteMany();
     }
 
     static async deleteSession() {
-        await prismaClient.session.deleteMany();
+        const result = await prismaClient.session.deleteMany({
+            where: {
+                token: "test"
+            }
+        });
     }
 
     static async create() {
@@ -29,5 +31,19 @@ export class UserTest {
                 token: "test"
             }
         })
+    }
+
+    static async getToken(): Promise<Session>{
+        const token = await prismaClient.session.findFirst({
+            where: {
+                token: "test"
+            }
+        })
+
+        if (!token) {
+            throw new Error("Token is not found.");
+        }
+
+        return token;
     }
 }

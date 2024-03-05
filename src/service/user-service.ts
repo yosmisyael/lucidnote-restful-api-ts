@@ -97,4 +97,18 @@ export class UserService {
 
         return toUserResponse(result);
     }
+
+    static async logout(token: string): Promise<Boolean> {
+        const result = await prismaClient.session.deleteMany({
+            where: {
+                token
+            }
+        })
+
+        if (result.count !== 1) {
+            throw new ResponseError(500, "An error occurred when processing logout.");
+        }
+
+        return true
+    }
 }

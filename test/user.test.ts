@@ -3,7 +3,7 @@ import {server} from "../src/app/server";
 import {logger} from "../src/app/logging";
 import {UserTest} from "./test-util";
 
-describe('POST /api/users', () => {
+describe("POST /api/users", () => {
     afterEach(async () => {
         await UserTest.delete();
     })
@@ -38,7 +38,7 @@ describe('POST /api/users', () => {
     })
 })
 
-describe('POST /api/users/login', () => {
+describe("POST /api/users/login", () => {
     beforeEach(async () => {
         await UserTest.create();
     });
@@ -90,7 +90,7 @@ describe('POST /api/users/login', () => {
     })
 })
 
-describe('GET /api/users/current', () => {
+describe("GET /api/users/current", () => {
     beforeEach(async () => {
         await UserTest.create();
     });
@@ -122,7 +122,7 @@ describe('GET /api/users/current', () => {
     })
 })
 
-describe('PATCH /api/users/current', () => {
+describe("PATCH /api/users/current", () => {
     beforeEach(async () => {
         await UserTest.create();
     });
@@ -174,4 +174,35 @@ describe('PATCH /api/users/current', () => {
         expect(response.status).toBe(401);
         expect(response.body.error).toBe("Unauthorized.");
     })
+})
+
+describe("DELETE /api/users/logout", () => {
+    beforeEach(async () => {
+        await UserTest.create();
+    });
+
+    afterEach(async () => {
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    })
+
+    it('logout success', async () => {
+        const response = await supertest(server)
+            .delete("/api/users/logout")
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBe("OK");
+    });
+
+    it('deny logout request if token is invalid', async () => {
+        const response = await supertest(server)
+            .delete("/api/users/logout")
+            .set("X-API-TOKEN", "wrong");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBeDefined();
+    });
 })
