@@ -5,8 +5,9 @@ import {UserTest} from "./test-util";
 
 describe("POST /api/users", () => {
     afterEach(async () => {
+        await UserTest.deleteSession();
         await UserTest.delete();
-    })
+    });
 
     it('deny user registration if request is invalid', async () => {
         const response = await supertest(server)
@@ -92,7 +93,7 @@ describe("POST /api/users/login", () => {
 
 describe("GET /api/users/current", () => {
     beforeEach(async () => {
-        await UserTest.create();
+        await UserTest.createAndLogin();
     });
 
     afterEach(async () => {
@@ -124,7 +125,7 @@ describe("GET /api/users/current", () => {
 
 describe("PATCH /api/users/current", () => {
     beforeEach(async () => {
-        await UserTest.create();
+        await UserTest.createAndLogin();
     });
 
     afterEach(async () => {
@@ -178,7 +179,7 @@ describe("PATCH /api/users/current", () => {
 
 describe("DELETE /api/users/logout", () => {
     beforeEach(async () => {
-        await UserTest.create();
+        await UserTest.createAndLogin();
     });
 
     afterEach(async () => {

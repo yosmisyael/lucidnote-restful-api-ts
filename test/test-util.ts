@@ -9,14 +9,21 @@ export class UserTest {
     }
 
     static async deleteSession() {
-        const result = await prismaClient.session.deleteMany({
-            where: {
-                token: "test"
-            }
-        });
+        const result = await prismaClient.session.deleteMany();
     }
 
     static async create() {
+        await prismaClient.user.create({
+            data: {
+                name: "test",
+                email: "test@example.com",
+                username: "test",
+                password: await bcrypt.hash("test", 10)
+            }
+        })
+    }
+
+    static async createAndLogin(): Promise<void> {
         const user = await prismaClient.user.create({
             data: {
                 name: "test",
@@ -25,6 +32,7 @@ export class UserTest {
                 password: await bcrypt.hash("test", 10)
             }
         })
+
         await prismaClient.session.create({
             data: {
                 userId: user.id,
