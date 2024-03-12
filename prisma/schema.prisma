@@ -58,6 +58,7 @@ model Tag {
   user   User      @relation(fields: [userId], references: [id])
   notes  NoteTag[]
 
+  @@unique([name, userId])
   @@map("tags")
 }
 

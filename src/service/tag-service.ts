@@ -24,6 +24,18 @@ export class TagService {
 
     static async create(user: User, request: CreateTagRequest): Promise<TagResponse> {
         const createRequest: CreateTagRequest = Validation.validate(TagValidation.CREATE, request);
+
+        const checkTag: number = await prismaClient.tag.count({
+            where: {
+                userId: user.id,
+                name: createRequest.name
+            }
+        });
+
+        if (checkTag !== 0) {
+            throw new ResponseError(400, "Tag name is already taken.");
+        }
+
         const preparedData = {
             ...createRequest,
             ...{userId: user.id}
@@ -38,6 +50,18 @@ export class TagService {
 
     static async update(user: User, request: UpdateTagRequest): Promise<TagResponse> {
         const updateRequest: UpdateTagRequest = Validation.validate(TagValidation.UPDATE, request);
+
+        const checkTag: number = await prismaClient.tag.count({
+            where: {
+                userId: user.id,
+                name: updateRequest.name
+            }
+        });
+
+        if (checkTag > 1) {
+            throw new ResponseError(400, "Tag name is already taken.");
+        }
+
         await this.verifyTag(user.id, updateRequest.id);
 
         const tag = await prismaClient.tag.update({
