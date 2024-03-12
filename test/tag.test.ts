@@ -26,7 +26,7 @@ describe("POST /api/tags", () => {
         expect(response.status).toBe(200);
         expect(response.body.data.id).toBeDefined();
         expect(response.body.data.name).toBe("example tag");
-    })
+    });
 
     it("should deny user request to create a new tag if request is invalid", async () => {
         const response = await supertest(server)
@@ -39,7 +39,21 @@ describe("POST /api/tags", () => {
         logger.debug(response.body);
         expect(response.status).toBe(400);
         expect(response.body.error).toBeDefined();
-    })
+    });
+
+    it("should deny user request to create a new tag if tag name is already exist", async () => {
+        await TagTest.create();
+        const response = await supertest(server)
+            .post("/api/tags")
+            .set("X-API-TOKEN", "test")
+            .send({
+                name: "example tag"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBeDefined();
+    });
 })
 
 describe("PATCH /api/tags/:tagId", () => {
@@ -54,7 +68,7 @@ describe("PATCH /api/tags/:tagId", () => {
         await UserTest.delete();
     })
 
-    it("should allow the user to update the tag", async () => {
+    it("should allow user to update the tag", async () => {
         const tag = await TagTest.get();
         const response = await supertest(server)
             .patch(`/api/tags/${tag.id}`)
@@ -69,7 +83,22 @@ describe("PATCH /api/tags/:tagId", () => {
         expect(response.body.data.name).toBe("updated example tag");
     });
 
-    it("should deny the user request to update the tag if request is invalid", async () => {
+    it("should allow user to update the tag with no change in name", async () => {
+        const tag = await TagTest.get();
+        const response = await supertest(server)
+            .patch(`/api/tags/${tag.id}`)
+            .set("X-API-TOKEN", "test")
+            .send({
+                name: "example tag"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200 );
+        expect(response.body.data.id).toBe(tag.id);
+        expect(response.body.data.name).toBe("example tag");
+    });
+
+    it("should deny user request to update the tag if request is invalid", async () => {
         const tag = await TagTest.get();
         const response = await supertest(server)
             .patch(`/api/tags/${tag.id}`)
