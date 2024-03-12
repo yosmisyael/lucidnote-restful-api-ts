@@ -1,11 +1,28 @@
 import {CreateTagRequest, TagResponse, toTagResponse, UpdateTagRequest} from "../model/tag-model";
-import {Tag, User} from "@prisma/client";
+import {Prisma, Tag, User} from "@prisma/client";
 import {Validation} from "../validation/validation";
 import {TagValidation} from "../validation/tag-validation";
 import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
 
 export class TagService {
+
+    static async verifyUniqueness(userId: string, name: string, tagId?: string): Promise<boolean> {
+        const whereClause: Prisma.TagWhereInput = {
+            userId,
+            name
+        };
+
+        if (tagId) {
+            whereClause.NOT = { id: tagId };
+        }
+
+        const countTags = await prismaClient.tag.count({
+            where: whereClause
+        });
+
+        return countTags === 0;
+    }
 
     static async verifyTag(userId: string, tagId: string): Promise<Tag> {
         const tag = await prismaClient.tag.findUnique({
@@ -24,15 +41,9 @@ export class TagService {
 
     static async create(user: User, request: CreateTagRequest): Promise<TagResponse> {
         const createRequest: CreateTagRequest = Validation.validate(TagValidation.CREATE, request);
+        const isAvailable: boolean = await this.verifyUniqueness(user.id, createRequest.name);
 
-        const checkTag: number = await prismaClient.tag.count({
-            where: {
-                userId: user.id,
-                name: createRequest.name
-            }
-        });
-
-        if (checkTag !== 0) {
+        if (!isAvailable) {
             throw new ResponseError(400, "Tag name is already taken.");
         }
 
@@ -50,15 +61,9 @@ export class TagService {
 
     static async update(user: User, request: UpdateTagRequest): Promise<TagResponse> {
         const updateRequest: UpdateTagRequest = Validation.validate(TagValidation.UPDATE, request);
+        const isAvailable: boolean = await this.verifyUniqueness(user.id, updateRequest.name, updateRequest.id);
 
-        const checkTag: number = await prismaClient.tag.count({
-            where: {
-                userId: user.id,
-                name: updateRequest.name
-            }
-        });
-
-        if (checkTag > 1) {
+        if (!isAvailable) {
             throw new ResponseError(400, "Tag name is already taken.");
         }
 
