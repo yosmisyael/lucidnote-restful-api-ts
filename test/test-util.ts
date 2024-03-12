@@ -61,4 +61,28 @@ export class NoteTest {
     static async deleteAll() {
         await prismaClient.note.deleteMany()
     }
+
+    static async create() {
+        const user = await prismaClient.user.findUnique({
+            where: {
+                username: "test"
+            }
+        });
+
+        await prismaClient.note.create({
+            data: {
+                title: "Example Note",
+                body: "Example Note",
+                userId: user.id
+            }
+        });
+    }
+
+    static async get() {
+        return prismaClient.note.findFirst({
+            where: {
+                title: "Example Note"
+            }
+        });
+    }
 }

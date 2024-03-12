@@ -47,3 +47,41 @@ describe("POST /api/notes", () => {
     });
 
 });
+
+describe("GET /api/notes/:noteId", () => {
+    beforeEach(async () => {
+        await UserTest.createAndLogin();
+        await NoteTest.create();
+    });
+
+    afterEach(async () => {
+        await NoteTest.deleteAll();
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    });
+
+    it("should be able to get note", async () => {
+        const note = await NoteTest.get()
+        const response = await supertest(server)
+            .get(`/api/notes/${note.id}`)
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.id).toBe(note.id);
+        expect(response.body.data.title).toBe(note.title);
+        expect(response.body.data.body).toBe(note.body);
+        expect(response.body.data.createdAt).toBeDefined();
+        expect(response.body.data.updatedAt).toBeDefined();
+    });
+
+    it("should reject get note request if note does not exist", async () => {
+        const response = await supertest(server)
+            .get(`/api/notes/wrong`)
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBeDefined();
+    });
+})

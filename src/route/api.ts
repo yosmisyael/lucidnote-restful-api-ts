@@ -11,3 +11,4 @@ apiRouter.patch('/api/users/current', UserController.update);
 apiRouter.delete('/api/users/logout', UserController.logout);
 
 apiRouter.post("/api/notes", NoteController.create);
+apiRouter.get("/api/notes/:noteId", NoteController.get);

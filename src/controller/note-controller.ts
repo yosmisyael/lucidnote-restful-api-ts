@@ -16,4 +16,17 @@ export class NoteController {
             next(e);
         }
     }
+
+    static async get(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const noteId = req.params.noteId;
+            const response = await NoteService.get(req.user!, noteId);
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
 }
