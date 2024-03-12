@@ -2,6 +2,7 @@ import {CreateTagRequest, TagResponse, UpdateTagRequest} from "../model/tag-mode
 import {Response, NextFunction} from "express";
 import {TagService} from "../service/tag-service";
 import {UserRequest} from "../type/user-request";
+import {logger} from "../app/logging";
 
 export class TagController {
     static async create(req: UserRequest, res: Response, next: NextFunction) {
@@ -23,6 +24,18 @@ export class TagController {
             const response: TagResponse = await TagService.update(req.user!, request);
             res.status(200).json({
                 data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async remove(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const tagId: string = req.params.tagId;
+            await TagService.remove(req.user!, tagId);
+            res.status(200).json({
+               data: "OK"
             });
         } catch (e) {
             next(e);

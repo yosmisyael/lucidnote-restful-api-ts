@@ -75,4 +75,15 @@ export class TagService {
         return toTagResponse(tag);
     }
 
+    static async remove(user: User, tagId: string): Promise<TagResponse> {
+        await this.verifyTag(user.id, tagId);
+        const tag = await prismaClient.tag.delete({
+            where: {
+                userId: user.id,
+                id: tagId
+            }
+        });
+
+        return toTagResponse(tag);
+    }
 }
