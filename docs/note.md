@@ -10,8 +10,8 @@ Request body:
 ```json
 {
   "data": {
-    "title": "My Note",                 // optional
-    "body": "This is my first note."    // optional
+    "title": "My Note",                 
+    "body": "This is my first note."  // optional
   }
 }
 ```
@@ -19,14 +19,18 @@ Response body success:
 ```json
 {
   "data": {
-    "id": "uuid"
+    "id": "uuid",
+    "title": "My Note",
+    "body": "This is my first note.",
+    "createdAt": "YYYY-MM-DD hh:mm:ss",
+    "updatedAt": "YYYY-MM-DD hh:mm:ss"
   }
 }
 ```
 Response body error:
 ```json
 {
-  "errors": "Title is required."
+  "error": "Title is required."
 }
 ```
 
@@ -40,7 +44,7 @@ Request body:
 ```json
 {
   "title": "My New Title",
-  "body": "I just updated my note."
+  "body": "I just updated my note."   // optional
 }
 ```
 Response body success:
@@ -50,15 +54,15 @@ Response body success:
     "id": "unique-id",
     "title": "My New Title",
     "body": "I just updated my note.",
-    "createdAt": 1688302310471,
-    "updatedAt": 1688302324523
+    "createdAt": "YYYY-MM-DD hh:mm:ss",
+    "updatedAt": "YYYY-MM-DD hh:mm:ss"
   }
 }
 ```
 Response body error:
 ```json
 {
-  "errors": "Title is required."
+  "error": "Title is required."
 }
 ```
 
@@ -74,8 +78,8 @@ Response body success:
   "id": "unique-id",
   "title": "My New Title",
   "body": "I just updated my note.",
-  "createdAt": 1688302310471,
-  "updatedAt": 1688302310471
+  "createdAt": "YYYY-MM-DD hh:mm:ss",
+  "updatedAt": "YYYY-MM-DD hh:mm:ss"
 }
 ```
 Response body error:
@@ -100,7 +104,7 @@ Response body success:
 Response body error:
 ```json
 {
-  "errors": "note is not found"
+  "error": "Note does not exist."
 }
 ```
 
@@ -122,15 +126,15 @@ Query Params:
       "id": "unique-id",
       "title": "first note",
       "body": "example body",
-      "createdAt": 1688302310471,
-      "updatedAt": 1688302324523
+      "createdAt": "YYYY-MM-DD hh:mm:ss",
+      "updatedAt": "YYYY-MM-DD hh:mm:ss"
     }, 
     {
       "id": "unique-id",
       "title": "second note",
       "body": "example body",
-      "createdAt": 1688302310471,
-      "updatedAt": 1688302324523
+      "createdAt": "YYYY-MM-DD hh:mm:ss",
+      "updatedAt": "YYYY-MM-DD hh:mm:ss"
     } 
   ],
   "paging": {
@@ -161,15 +165,15 @@ Response body success:
       "id": "unique-id",
       "title": "first note",
       "body": "example body",
-      "createdAt": 1688302310471,
-      "updatedAt": 1688302324523
+      "createdAt": "YYYY-MM-DD hh:mm:ss",
+      "updatedAt": "YYYY-MM-DD hh:mm:ss"
     }, 
     {
       "id": "unique-id",
       "title": "second note",
       "body": "example body",
-      "createdAt": 1688302310471,
-      "updatedAt": 1688302324523
+      "createdAt": "YYYY-MM-DD hh:mm:ss",
+      "updatedAt": "YYYY-MM-DD hh:mm:ss"
     } 
   ],
   "paging": {
@@ -203,7 +207,7 @@ Response body success:
 Response body error:
 ```json
 {
-  "error": "unauthorized"
+  "error": "Unauthorized."
 }
 ```
 
