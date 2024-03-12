@@ -39,17 +39,7 @@ export class NoteService {
     }
 
     static async get(user: User, id: string): Promise<NoteResponse> {
-        const note = await prismaClient.note.findUnique({
-            where: {
-                id: id,
-                userId: user.id
-            }
-        });
-
-        if (!note) {
-            throw new ResponseError(404, "Note does not exist.");
-        }
-
+        const note = await this.verifyNote(user.id, id);
         return toNoteResponse(note);
     }
 
