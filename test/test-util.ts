@@ -1,18 +1,18 @@
 import {prismaClient} from "../src/app/database";
 import bcrypt from "bcrypt";
-import {UserService} from "../src/service/user-service";
-import {Session, User} from "@prisma/client";
+import {Session} from "@prisma/client";
+import {ResponseError} from "../src/error/response-error";
 
 export class UserTest {
-    static async delete() {
+    static async delete(): Promise<void> {
         await prismaClient.user.deleteMany();
     }
 
-    static async deleteSession() {
-        const result = await prismaClient.session.deleteMany();
+    static async deleteSession(): Promise<void> {
+        await prismaClient.session.deleteMany();
     }
 
-    static async create() {
+    static async create(): Promise<void> {
         await prismaClient.user.create({
             data: {
                 name: "test",
@@ -41,7 +41,7 @@ export class UserTest {
         })
     }
 
-    static async getToken(): Promise<Session>{
+    static async getToken(): Promise<Session> {
         const token = await prismaClient.session.findFirst({
             where: {
                 token: "test"
@@ -58,16 +58,20 @@ export class UserTest {
 
 export class NoteTest {
 
-    static async deleteAll() {
+    static async deleteAll(): Promise<void> {
         await prismaClient.note.deleteMany()
     }
 
-    static async create() {
+    static async create(): Promise<void> {
         const user = await prismaClient.user.findUnique({
             where: {
                 username: "test"
             }
         });
+
+        if (!user) {
+            throw new ResponseError(404, "User is not found.");
+        }
 
         await prismaClient.note.create({
             data: {
@@ -79,10 +83,16 @@ export class NoteTest {
     }
 
     static async get() {
-        return prismaClient.note.findFirst({
+        const note = await prismaClient.note.findFirst({
             where: {
                 title: "Example Note"
             }
         });
+
+        if (!note) {
+            throw new ResponseError(404, "Note does not exist.");
+        }
+
+        return note;
     }
 }
