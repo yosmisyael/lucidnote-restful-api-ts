@@ -98,7 +98,42 @@ export class NoteTest {
 }
 
 export class TagTest {
+
+    static async create() {
+        const user = await prismaClient.user.findUnique({
+            where: {
+                username: "test"
+            }
+        });
+
+        if (!user) {
+            throw new ResponseError(404, "User is not found.");
+        }
+
+        await prismaClient.tag.create({
+            data: {
+                name: "example tag",
+                userId: user.id
+            }
+        });
+    }
+
+    static async get() {
+        const tag = await prismaClient.tag.findFirst({
+            where: {
+                name: "example tag"
+            }
+        });
+
+        if (!tag) {
+            throw new ResponseError(404, "Tag does not exist.");
+        }
+
+        return tag;
+    }
+
     static async deleteAll() {
         await prismaClient.tag.deleteMany();
     }
+
 }
