@@ -2,7 +2,6 @@ import {UserRequest} from "../type/user-request";
 import {NextFunction, Response} from "express";
 import {CreateNoteRequest, UpdateNoteRequest} from "../model/note-model";
 import {NoteService} from "../service/note-service";
-import {logger} from "../app/logging";
 
 export class NoteController {
 

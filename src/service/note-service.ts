@@ -4,7 +4,6 @@ import {NoteValidation} from "../validation/note-validation";
 import {Note, User} from "@prisma/client";
 import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
-import * as string_decoder from "string_decoder";
 
 export class NoteService {
 
