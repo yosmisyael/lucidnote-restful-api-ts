@@ -13,6 +13,12 @@ export type CreateNoteRequest = {
     body?: string;
 }
 
+export type UpdateNoteRequest = {
+    id: string;
+    title: string;
+    body?: string;
+}
+
 export function toNoteResponse(note: Note): NoteResponse {
     return {
         id: note.id,
