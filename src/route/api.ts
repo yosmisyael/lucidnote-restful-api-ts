@@ -13,3 +13,4 @@ apiRouter.delete('/api/users/logout', UserController.logout);
 apiRouter.post("/api/notes", NoteController.create);
 apiRouter.get("/api/notes/:noteId", NoteController.get);
 apiRouter.patch("/api/notes/:noteId", NoteController.update);
+apiRouter.delete("/api/notes/:noteId", NoteController.remove);

@@ -56,4 +56,17 @@ export class NoteService {
 
         return toNoteResponse(note);
     }
+
+    static async remove(user: User, noteId: string): Promise<NoteResponse> {
+        await this.verifyNote(user.id, noteId);
+        const note = await prismaClient.note.delete({
+            where: {
+                userId: user.id,
+                id: noteId
+            }
+        });
+
+        return toNoteResponse(note);
+    }
+
 }

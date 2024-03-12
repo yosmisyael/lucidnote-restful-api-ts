@@ -42,4 +42,17 @@ export class NoteController {
         }
     }
 
+
+    static async remove(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const noteId = req.params.noteId;
+            await NoteService.remove(req.user!, noteId);
+            res.status(200).json({
+                data: "OK"
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
+
 }

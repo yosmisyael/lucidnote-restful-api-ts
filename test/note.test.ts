@@ -132,3 +132,37 @@ describe("PATCH /api/notes/:noteId", () => {
         expect(response.body.error).toBeDefined();
     });
 })
+
+describe("DELETE /api/notes/:noteId", () => {
+    beforeEach(async () => {
+        await UserTest.createAndLogin();
+        await NoteTest.create();
+    });
+
+    afterEach(async () => {
+        await NoteTest.deleteAll();
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    });
+
+    it("should allow the user to delete the note", async () => {
+       const note = await NoteTest.get();
+       const response = await supertest(server)
+           .delete(`/api/notes/${note.id}`)
+           .set("X-API-TOKEN", "test");
+
+       logger.debug(response.body);
+       expect(response.status).toBe(200);
+       expect(response.body.data).toBe("OK");
+    });
+
+    it("should deny the user request to delete note if it does not exist", async () => {
+        const response = await supertest(server)
+            .delete("/api/notes/wrong")
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBeDefined();
+    });
+})
