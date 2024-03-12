@@ -55,3 +55,10 @@ export class UserTest {
         return token;
     }
 }
+
+export class NoteTest {
+
+    static async deleteAll() {
+        await prismaClient.note.deleteMany()
+    }
+}
