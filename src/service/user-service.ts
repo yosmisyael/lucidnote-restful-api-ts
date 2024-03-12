@@ -11,19 +11,32 @@ import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
 import bcrypt from "bcrypt";
 import {v4 as uuid} from "uuid";
-import {User} from "@prisma/client";
+import {Prisma, User} from "@prisma/client";
 
 export class UserService {
+
+    static async verifyUniqueUsername(username: string, userId?: string): Promise<boolean> {
+        const whereClause: Prisma.UserWhereInput = {
+            username
+        }
+
+        if (userId) {
+            whereClause.NOT = { id: userId }
+        }
+
+        const countUsernames = await prismaClient.user.count({
+            where: whereClause
+        });
+
+        return countUsernames === 0;
+    }
+
     static async register(request: RegisterUserRequest): Promise<UserResponse> {
         const registerRequest = Validation.validate(UserValidation.REGISTER, request);
 
-        const checkUsername = await prismaClient.user.count({
-            where: {
-                username: registerRequest.username
-            }
-        });
+        const isAvailable: boolean = await this.verifyUniqueUsername(registerRequest.username);
 
-        if (checkUsername !== 0) {
+        if (!isAvailable) {
             throw new ResponseError(400, "Username is already taken.");
         }
 
@@ -81,6 +94,12 @@ export class UserService {
         }
 
         if (updateRequest.username) {
+            const isAvailable: boolean = await this.verifyUniqueUsername(updateRequest.username, user.id);
+
+            if (!isAvailable) {
+                throw new ResponseError(400, "Username is already taken.");
+            }
+
             user.username = updateRequest.username;
         }
 
