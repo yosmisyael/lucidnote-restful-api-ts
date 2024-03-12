@@ -2,6 +2,7 @@ import {TagTest, UserTest} from "./test-util";
 import supertest = require("supertest");
 import {server} from "../src/app/server";
 import {logger} from "../src/app/logging";
+import {exceptions} from "winston";
 
 describe("POST /api/tags", () => {
     beforeEach(async () => {
@@ -144,5 +145,29 @@ describe("DELETE /api/tags/:tagId", () => {
         logger.debug(response.body);
         expect(response.status).toBe(404);
         expect(response.body.error).toBeDefined();
+    });
+})
+
+describe("GET /api/tags", () => {
+    beforeEach(async () => {
+        await UserTest.createAndLogin();
+        await TagTest.create();
+    });
+
+    afterEach(async () => {
+        await TagTest.deleteAll();
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    });
+
+    it("should allow user to get all its tag", async () => {
+        const response = await supertest(server)
+            .get("/api/tags")
+            .set("X-API-TOKEN", "test");
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data).toBeInstanceOf(Array);
+        expect(response.body.data.length).toBe(1);
     });
 })

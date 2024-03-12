@@ -86,4 +86,16 @@ export class TagService {
 
         return toTagResponse(tag);
     }
+
+    static async getAll(user: User): Promise<{id: string, name: string}[]> {
+        return prismaClient.tag.findMany({
+            where: {
+                userId: user.id
+            },
+            select: {
+                id: true,
+                name: true,
+            }
+        });
+    }
 }

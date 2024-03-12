@@ -41,4 +41,15 @@ export class TagController {
             next(e);
         }
     }
+
+    static async getAll(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const response = await TagService.getAll(req.user!);
+            res.status(200).json({
+                data: response
+            });
+        } catch (e) {
+            next(e);
+        }
+    }
 }
