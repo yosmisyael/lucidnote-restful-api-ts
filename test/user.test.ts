@@ -23,6 +23,21 @@ describe("POST /api/users", () => {
         expect(response.body.error).toBeDefined();
     });
 
+    it('should deny user registration if username is already taken', async () => {
+        await UserTest.create();
+        const response = await supertest(server)
+            .post("/api/users")
+            .send({
+                name: "test",
+                email: "test@example.com",
+                username: "test",
+                password: "test"
+            });
+        logger.debug(response.body);
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBeDefined();
+    });
+
     it('register user success', async () => {
         const response = await supertest(server)
             .post("/api/users")
@@ -146,6 +161,21 @@ describe("PATCH /api/users/current", () => {
         expect(response.status).toBe(200);
         expect(response.body.data.name).toBe("user");
         expect(response.body.data.username).toBe("user");
+    })
+
+    it('should allow update user even username is same', async () => {
+        const response = await supertest(server)
+            .patch('/api/users/current')
+            .set('X-API-TOKEN', 'test')
+            .send({
+                username: "test",
+                name: "test"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.name).toBe("test");
+        expect(response.body.data.username).toBe("test");
     })
 
     it('deny update user if request is invalid', async () => {
