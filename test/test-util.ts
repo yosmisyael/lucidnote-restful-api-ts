@@ -96,3 +96,9 @@ export class NoteTest {
         return note;
     }
 }
+
+export class TagTest {
+    static async deleteAll() {
+        await prismaClient.tag.deleteMany();
+    }
+}
