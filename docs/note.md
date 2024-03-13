@@ -138,9 +138,9 @@ Query Params:
     } 
   ],
   "paging": {
-    "page": 1,
+    "size": 2,
     "totalPage": 3,
-    "totalItem": 30
+    "currentPage": 1
   }
 }
 ```
@@ -177,9 +177,9 @@ Response body success:
     } 
   ],
   "paging": {
-    "page": 1,
+    "size": 2,
     "totalPage": 3,
-    "totalItem": 30
+    "currentPage": 1
   }
 }
 ```
