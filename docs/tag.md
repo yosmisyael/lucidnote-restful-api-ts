@@ -17,7 +17,8 @@ Response body success:
 ```json
 {
   "data": {
-    "id": "uuid"
+    "id": "uuid",
+    "name": "test"
   }
 }
 ```
@@ -25,7 +26,7 @@ Response body success:
 Response body error:
 ```json
 {
-  "error": "Tag is already exist."
+  "error": "Tag name is already taken."
 }
 ```
 
@@ -87,7 +88,7 @@ Response body success:
 Response body error:
 ```json
 {
-  "error": "Tag is invalid."
+  "error": "Tag does not exist."
 }
 ```
 
