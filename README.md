@@ -9,9 +9,9 @@ Lucidnote RESTFUL API is a TypeScript-based RESTful API rewrite of a note-taking
 ---
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 ### Prerequisites
-- Node JS installed
-- MySQL/MariaDB installed
-### Installing
+- Runtime: Node JS
+- Database: MySQL/MariaDB
+### Installing and Deploying
 1. Install all dependencies with this command:
 ```shell
 npm install
