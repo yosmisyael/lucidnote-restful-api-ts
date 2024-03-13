@@ -1,8 +1,6 @@
-import {Request, Response, NextFunction} from "express";
+import {Response, NextFunction} from "express";
 import {prismaClient} from "../app/database";
 import {UserRequest} from "../type/user-request";
-import {util} from "zod";
-import objectKeys = util.objectKeys;
 
 export const authMiddleware = async (req: UserRequest, res: Response, next: NextFunction)=> {
     const token = req.get("X-API-TOKEN");
