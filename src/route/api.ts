@@ -15,6 +15,7 @@ apiRouter.post("/api/notes", NoteController.create);
 apiRouter.get("/api/notes/:noteId", NoteController.get);
 apiRouter.patch("/api/notes/:noteId", NoteController.update);
 apiRouter.delete("/api/notes/:noteId", NoteController.remove);
+apiRouter.get("/api/notes", NoteController.search);
 
 apiRouter.get("/api/tags", TagController.getAll);
 apiRouter.post("/api/tags", TagController.create);

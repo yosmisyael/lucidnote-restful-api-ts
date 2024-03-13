@@ -19,6 +19,12 @@ export type UpdateNoteRequest = {
     body?: string;
 }
 
+export type SearchNoteRequest = {
+    title?: string;
+    page: number;
+    size: number;
+}
+
 export function toNoteResponse(note: Note): NoteResponse {
     return {
         id: note.id,

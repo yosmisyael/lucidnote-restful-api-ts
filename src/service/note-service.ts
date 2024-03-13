@@ -1,9 +1,11 @@
 import {CreateNoteRequest, NoteResponse, toNoteResponse, UpdateNoteRequest} from "../model/note-model";
 import {Validation} from "../validation/validation";
 import {NoteValidation} from "../validation/note-validation";
-import {Note, User} from "@prisma/client";
+import {Note, Prisma, User} from "@prisma/client";
 import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
+import {SearchNoteRequest} from "../model/note-model";
+import {Pageable} from "../model/page-model";
 
 export class NoteService {
 
@@ -67,6 +69,55 @@ export class NoteService {
         });
 
         return toNoteResponse(note);
+    }
+
+    static async search(user: User, request: SearchNoteRequest): Promise<Pageable<NoteResponse>> {
+        const searchRequest: SearchNoteRequest = Validation.validate(NoteValidation.SEARCH, request);
+        const skip: number = (searchRequest.page - 1) * searchRequest.size;
+
+        const filters: Prisma.NoteWhereInput[] = [];
+
+        if (searchRequest.title) {
+            filters.push({
+                OR: [
+                    {
+                        title: {
+                            equals: searchRequest.title
+                        }
+                    },
+                    {
+                        title: {
+                            contains: searchRequest.title
+                        }
+                    }
+                ]
+            });
+        }
+
+        const notes = await prismaClient.note.findMany({
+            where: {
+                userId: user.id,
+                AND: filters
+            },
+            take: searchRequest.size,
+            skip: skip
+        });
+
+        const countNotes = await prismaClient.note.count({
+            where: {
+                userId: user.id,
+                AND: filters
+            },
+        });
+
+        return {
+            data: notes.map(note => toNoteResponse(note)),
+            paging: {
+                currentPage: searchRequest.page,
+                totalPage: Math.ceil(countNotes / searchRequest.size),
+                size: searchRequest.size
+            }
+        }
     }
 
 }

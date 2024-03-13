@@ -1,7 +1,8 @@
 import {UserRequest} from "../type/user-request";
 import {NextFunction, Response} from "express";
-import {CreateNoteRequest, UpdateNoteRequest} from "../model/note-model";
+import {CreateNoteRequest, NoteResponse, SearchNoteRequest, UpdateNoteRequest} from "../model/note-model";
 import {NoteService} from "../service/note-service";
+import {Pageable} from "../model/page-model";
 
 export class NoteController {
 
@@ -50,6 +51,20 @@ export class NoteController {
             res.status(200).json({
                 data: "OK"
             });
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    static async search(req: UserRequest, res: Response, next: NextFunction) {
+        try {
+            const request: SearchNoteRequest = {
+                title: req.query.title as string,
+                size: req.query.size ? Number(req.query.size) : 10 as number,
+                page: req.query.page ? Number(req.query.page) : 1 as number,
+            }
+            const response: Pageable<NoteResponse> = await NoteService.search(req.user!, request);
+            res.status(200).json(response);
         } catch (e) {
             next(e);
         }

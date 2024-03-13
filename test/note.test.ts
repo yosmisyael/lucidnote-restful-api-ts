@@ -84,7 +84,7 @@ describe("GET /api/notes/:noteId", () => {
         expect(response.status).toBe(404);
         expect(response.body.error).toBeDefined();
     });
-})
+});
 
 describe("PATCH /api/notes/:noteId", () => {
     beforeEach(async () => {
@@ -131,7 +131,7 @@ describe("PATCH /api/notes/:noteId", () => {
         expect(response.status).toBe(400);
         expect(response.body.error).toBeDefined();
     });
-})
+});
 
 describe("DELETE /api/notes/:noteId", () => {
     beforeEach(async () => {
@@ -165,4 +165,80 @@ describe("DELETE /api/notes/:noteId", () => {
         expect(response.status).toBe(404);
         expect(response.body.error).toBeDefined();
     });
-})
+});
+
+describe("GET /api/notes", () => {
+    beforeEach(async () => {
+        await UserTest.createAndLogin();
+        await NoteTest.create();
+    });
+
+    afterEach(async () => {
+        await NoteTest.deleteAll();
+        await UserTest.deleteSession();
+        await UserTest.delete();
+    });
+
+    it("should be able to get all the notes", async () => {
+       const response = await supertest(server)
+           .get("/api/notes")
+           .set("X-API-TOKEN", "test");
+
+       logger.debug(response.body);
+       expect(response.status).toBe(200);
+       expect(response.body.data.length).toBe(1);
+       expect(response.body.paging.currentPage).toBe(1);
+       expect(response.body.paging.totalPage).toBe(1);
+       expect(response.body.paging.size).toBe(10);
+    });
+
+    it("should be able to search for notes using title", async () => {
+        const response = await supertest(server)
+            .get("/api/notes")
+            .set("X-API-TOKEN", "test")
+            .query({
+                title: "example"
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(1);
+        expect(response.body.paging.currentPage).toBe(1);
+        expect(response.body.paging.totalPage).toBe(1);
+        expect(response.body.paging.size).toBe(10);
+    });
+
+    it("should be able to search non-existent notes", async () => {
+        const response = await supertest(server)
+            .get("/api/notes")
+            .set("X-API-TOKEN", "test")
+            .query({
+                title: "wrong",
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(0);
+        expect(response.body.paging.currentPage).toBe(1);
+        expect(response.body.paging.totalPage).toBe(0);
+        expect(response.body.paging.size).toBe(10);
+    });
+
+    it("should be able to search notes with paging", async () => {
+        const response = await supertest(server)
+            .get("/api/notes")
+            .set("X-API-TOKEN", "test")
+            .query({
+                title: "exa",
+                page: 2,
+                size: 1
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(0);
+        expect(response.body.paging.currentPage).toBe(2);
+        expect(response.body.paging.totalPage).toBe(1);
+        expect(response.body.paging.size).toBe(1);
+    });
+});
