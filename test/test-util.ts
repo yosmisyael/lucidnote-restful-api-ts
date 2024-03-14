@@ -176,6 +176,20 @@ export class TagTest {
         return tag;
     }
 
+    static async getByName(name: string) {
+        const tag = await prismaClient.tag.findFirst({
+            where: {
+                name: name
+            }
+        });
+
+        if (!tag) {
+            throw new ResponseError(404, "Tag does not exist.");
+        }
+
+        return tag;
+    }
+
     static async deleteAll() {
         await prismaClient.tag.deleteMany();
     }

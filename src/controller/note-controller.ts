@@ -60,6 +60,7 @@ export class NoteController {
         try {
             const request: SearchNoteRequest = {
                 title: req.query.title as string,
+                tags: req.query.tags as Array<string>,
                 size: req.query.size ? Number(req.query.size) : 10 as number,
                 page: req.query.page ? Number(req.query.page) : 1 as number,
             }

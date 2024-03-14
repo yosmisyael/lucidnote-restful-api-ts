@@ -144,13 +144,35 @@ export class NoteService {
             });
         }
 
+        if (searchRequest.tags && searchRequest.tags.length > 0) {
+            const requestTag = searchRequest.tags.map((id) => ({ id }))
+            await this.verifyTag(user.id, requestTag);
+            filters.push({
+               tags: {
+                   some: {
+                       id: {
+                           in: searchRequest.tags
+                       }
+                   }
+               }
+            });
+        }
+
         const notes = await prismaClient.note.findMany({
             where: {
                 userId: user.id,
                 AND: filters
             },
             take: searchRequest.size,
-            skip: skip
+            skip: skip,
+            include: {
+                tags: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
         });
 
         const countNotes = await prismaClient.note.count({
@@ -161,7 +183,7 @@ export class NoteService {
         });
 
         return {
-            data: notes.map(note => toNoteResponse(note)),
+            data: notes.map(note => toNoteResponse(note, note.tags)),
             paging: {
                 currentPage: searchRequest.page,
                 totalPage: Math.ceil(countNotes / searchRequest.size),

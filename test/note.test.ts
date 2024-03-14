@@ -3,7 +3,6 @@ import supertest = require("supertest");
 import {server} from "../src/app/server";
 import {logger} from "../src/app/logging";
 import {Note} from "@prisma/client";
-import {NoteResponse} from "../src/model/note-model";
 
 describe("POST /api/notes", () => {
     beforeEach(async () => {
@@ -256,6 +255,7 @@ describe("GET /api/notes", () => {
     });
 
     afterEach(async () => {
+        await TagTest.deleteAll();
         await NoteTest.deleteAll();
         await UserTest.deleteSession();
         await UserTest.delete();
@@ -322,5 +322,28 @@ describe("GET /api/notes", () => {
         expect(response.body.paging.currentPage).toBe(2);
         expect(response.body.paging.totalPage).toBe(1);
         expect(response.body.paging.size).toBe(1);
+    });
+
+    it("should be able to filter notes by tags", async () => {
+        await NoteTest.createWithAttachTag();
+        await TagTest.create();
+        const firstTag = await TagTest.get();
+        const secondTag = await TagTest.getByName("test attach tag");
+        const response = await supertest(server)
+            .get("/api/notes")
+            .set("X-API-TOKEN", "test")
+            .query({
+                tags: [
+                    firstTag.id,
+                    secondTag.id
+                ]
+            });
+
+        logger.debug(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.data.length).toBe(1);
+        expect(response.body.paging.currentPage).toBe(1);
+        expect(response.body.paging.totalPage).toBe(1);
+        expect(response.body.paging.size).toBe(10);
     });
 });

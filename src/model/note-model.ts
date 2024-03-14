@@ -29,6 +29,7 @@ export type UpdateNoteRequest = {
 
 export type SearchNoteRequest = {
     title?: string;
+    tags?: string[];
     page: number;
     size: number;
 }
