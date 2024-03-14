@@ -24,6 +24,7 @@ export type UpdateNoteRequest = {
     id: string;
     title: string;
     body: string | null;
+    tags: { id: string }[];
 }
 
 export type SearchNoteRequest = {

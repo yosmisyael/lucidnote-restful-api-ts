@@ -6,11 +6,12 @@ import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
 import {SearchNoteRequest} from "../model/note-model";
 import {Pageable} from "../model/page-model";
+import {logger} from "../app/logging";
 
 export class NoteService {
 
     static async verifyTag(userId: string, tags: { id: string }[]): Promise<void> {
-        const tagIds = tags.map(({ id }) => id);
+        const tagIds = tags.map(({id}) => id);
         const result = await prismaClient.tag.findMany({
             where: {
                 id: {
@@ -76,14 +77,26 @@ export class NoteService {
 
     static async update(user: User, request: UpdateNoteRequest): Promise<NoteResponse> {
         const updateRequest: UpdateNoteRequest = Validation.validate(NoteValidation.UPDATE, request);
-        await this.get(user, updateRequest.id);
+        const isNoteAvailable: NoteResponse = await this.get(user, updateRequest.id);
+
+        const existingTagIdsArr = isNoteAvailable.tags!.map(({id}) => id)
+        const requestedTagIds: Set<string> = new Set(updateRequest.tags.map(({id}) => id));
+
+        const tagsToDisconnect: { id: string }[] = existingTagIdsArr.filter(id => !requestedTagIds.has(id)).map((id) => ({ id }));
 
         const note = await prismaClient.note.update({
             where: {
                 id: updateRequest.id,
                 userId: user.id
             },
-            data: updateRequest,
+            data: {
+                title: updateRequest.title,
+                body: updateRequest.body,
+                tags: {
+                    disconnect: tagsToDisconnect,
+                    connect: updateRequest.tags,
+                }
+            },
             include: {
                 tags: {
                     select: {

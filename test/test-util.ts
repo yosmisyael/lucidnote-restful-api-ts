@@ -1,7 +1,8 @@
 import {prismaClient} from "../src/app/database";
 import bcrypt from "bcrypt";
-import {Session} from "@prisma/client";
+import {Note, Session} from "@prisma/client";
 import {ResponseError} from "../src/error/response-error";
+import {NoteResponse, toNoteResponse} from "../src/model/note-model";
 
 export class UserTest {
     static async delete(): Promise<void> {
@@ -94,6 +95,49 @@ export class NoteTest {
         }
 
         return note;
+    }
+
+    static async getById(id: string) {
+        return prismaClient.note.findUnique({
+            where: {
+                id: id
+            },
+            include: {
+                tags: true
+            }
+        });
+    }
+
+    static async createWithAttachTag(): Promise<Note> {
+        const user = await prismaClient.user.findUnique({
+            where: {
+                username: "test"
+            }
+        });
+
+        if (!user) {
+            throw new ResponseError(404, "User is not found.");
+        }
+
+        const tag = await prismaClient.tag.create({
+            data: {
+                userId: user.id,
+                name: "test attach tag"
+            }
+        });
+
+        return prismaClient.note.create({
+            data: {
+                title: "Example Note",
+                body: "Example Note",
+                userId: user.id,
+                tags: {
+                    connect: {
+                        id: tag.id
+                    }
+                },
+            }
+        });
     }
 }
 
