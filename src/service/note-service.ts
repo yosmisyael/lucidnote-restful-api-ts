@@ -6,7 +6,6 @@ import {prismaClient} from "../app/database";
 import {ResponseError} from "../error/response-error";
 import {SearchNoteRequest} from "../model/note-model";
 import {Pageable} from "../model/page-model";
-import {logger} from "../app/logging";
 
 export class NoteService {
 
