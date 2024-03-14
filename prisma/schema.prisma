@@ -46,7 +46,7 @@ model Note {
   updatedAt DateTime  @updatedAt
   userId    String    @db.VarChar(36)
   user      User      @relation(fields: [userId], references: [id])
-  tags      NoteTag[]
+  tags      Tag[]
 
   @@map("notes")
 }
@@ -56,19 +56,8 @@ model Tag {
   name   String    @db.VarChar(255)
   userId String    @db.VarChar(36)
   user   User      @relation(fields: [userId], references: [id])
-  notes  NoteTag[]
+  notes  Note[]
 
   @@unique([name, userId])
   @@map("tags")
-}
-
-model NoteTag {
-  id     String @id @default(uuid()) @db.VarChar(36)
-  tagId  String @db.VarChar(36)
-  noteId String @db.VarChar(36)
-  tags   Tag    @relation(fields: [tagId], references: [id])
-  notes  Note   @relation(fields: [noteId], references: [id])
-
-  @@unique([tagId, noteId])
-  @@map("note_tag")
 }

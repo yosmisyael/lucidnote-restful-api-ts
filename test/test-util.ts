@@ -110,7 +110,7 @@ export class TagTest {
             throw new ResponseError(404, "User is not found.");
         }
 
-        await prismaClient.tag.create({
+        return prismaClient.tag.create({
             data: {
                 name: "example tag",
                 userId: user.id
