@@ -2,21 +2,21 @@ import {Note} from "@prisma/client";
 
 export type NoteResponse = {
     id: string;
-    title?: string | null;
-    body?: string | null;
+    title: string | null;
+    body: string | null;
     createdAt?: Date | null;
     updatedAt?: Date | null;
 }
 
 export type CreateNoteRequest = {
     title: string;
-    body?: string;
+    body: string | null;
 }
 
 export type UpdateNoteRequest = {
     id: string;
     title: string;
-    body?: string;
+    body: string | null;
 }
 
 export type SearchNoteRequest = {
