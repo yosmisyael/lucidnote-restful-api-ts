@@ -25,6 +25,19 @@ DATABASE_URL="mysql://db_username:db_password@host:port/lucidnote"
 npx prisma migrate dev
 npx prisma generate
 ```
+4. For testing, run this script:
+```shell
+npm run test
+```
+5. Build project with this script:
+```shell
+npm run build
+```
+6. Run app with this script:
+```shell
+npm run start
+```
+
 ## Build With
 
 <img src="https://cdn.worldvectorlogo.com/logos/prisma-2.svg" height="32">
